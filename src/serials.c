@@ -26,7 +26,7 @@ uint8_t serial_read(int fd)
     return data;
 }
 
-uint8_t serial_write(int fd, uint8_t data, uint16_t length)
+uint8_t serial_write(int fd, uint8_t *data, uint16_t length)
 {
     if (length > MAX_UART_BUFFER_SIZE || length == 0)
     {

@@ -3,7 +3,7 @@
 
 #include <termios.h> // For speed_t type
 
-#define MAX_UART_BUFFER_SIZE 10 // Adjust as needed
+// #define MAX_UART_BUFFER_SIZE 10 // Adjust as needed
 /**
  * @brief Initialize and configure a UART port
  *

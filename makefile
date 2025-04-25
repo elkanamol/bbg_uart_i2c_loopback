@@ -1,16 +1,32 @@
 CC = gcc
 CFLAGS = -Wall -O2 -Iinclude
 
-all: esp8266_app
+TARGET = uart_i2c_loopback
+SRC_DIR = src
+INCLUDE_DIR = include
+OBJ_DIR = obj
 
-uart.o: src/uart.c include/uart.h
-	$(CC) $(CFLAGS) -c src/uart.c -o uart.o
+# Create obj directory if it doesn't exist
+$(shell mkdir -p $(OBJ_DIR))
 
-esp8266.o: src/esp8266.c include/esp8266.h
-	$(CC) $(CFLAGS) -c src/esp8266.c -o esp8266.o
+# Source files
+SRCS = $(wildcard $(SRC_DIR)/*.c)
 
-esp8266_app: src/main.c uart.o esp8266.o
-	$(CC) $(CFLAGS) src/main.c uart.o esp8266.o -o esp8266_app
+# Object files
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
+
+all: $(TARGET)
+
+# Compile source files into object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Link object files into executable
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-	rm -f esp8266_app *.o
+	rm -f $(TARGET) $(OBJ_DIR)/*.o
+	rmdir $(OBJ_DIR) 2>/dev/null || true
+
+.PHONY: all clean

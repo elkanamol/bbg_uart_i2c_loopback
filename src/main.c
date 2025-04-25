@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
             // send data to UART
             printf("Enter data to send: ");
             scanf("%s", txBuffer);
-            serial_write(uart_fd, txBuffer, strlen(txBuffer));
+            serial_write(uart_fd, (uint8_t*)txBuffer, strlen(txBuffer));
             printf("Data sent\n");
             break;
         case 2:
