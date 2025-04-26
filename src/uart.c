@@ -67,3 +67,13 @@ int init_uart(const char* port, speed_t baudrate)
     tcflush(fd, TCIOFLUSH);
     return fd;
 }
+
+int uart_dinit(int fd)
+{
+    if (fd < 0) {
+        fprintf(stderr, "Error: Invalid file descriptor\n");
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
