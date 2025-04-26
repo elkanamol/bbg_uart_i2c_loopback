@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
 
     // Initialize UART
-    char *port = "/dev/ttyS0";
+    char *port = "/dev/ttyS1";
     int uart_fd = serial_open(port, B115200);
     if (uart_fd < 0)
     {
@@ -31,9 +31,10 @@ int main(int argc, char *argv[])
     char prompt[] = "Please select an option:\n \
                     1. Send data to UART\n \
                     2. Send data with CRC to UART\n \
-                    3. Receive data from UART\n \
-                    4. Restart UART\n \
-                    5. Exit\n";
+                    3. Send 0-9 characters\n \
+                    4. Receive data from UART\n \
+                    5. Restart UART\n \
+                    6. Exit\n";
     while (1)
     {
         printf("%s", prompt);
@@ -85,6 +86,19 @@ int main(int argc, char *argv[])
             break;
 
         case 3:
+            if (uart_fd < 0)
+            {
+                printf("UART is not initialized. Please restart it first.\n");
+                break;
+            }
+            // send data to UART
+            memset(txBuffer, 0, sizeof(txBuffer));
+            sprintf(txBuffer, "0123456789");
+            bytes_sent = serial_write(uart_fd, (uint8_t *)txBuffer, strlen(txBuffer));
+            printf("Data sent [%d] bytes\n", bytes_sent);
+            break;
+
+        case 4:
             // receive data from UART
             if (uart_fd < 0)
             {
@@ -99,21 +113,24 @@ int main(int argc, char *argv[])
                 printf("Received data: %s\n", rxBuffer);
             }
             break;
-        case 4:
+        case 5:
             // restart UART
-            int new_fd = serial_restart(uart_fd, port, B115200);
-            if (new_fd < 0)
             {
-                printf("Failed to restart UART. Error code: %d\n", new_fd);
-                uart_fd = -1;
-            }
-            else
-            {
-                uart_fd = new_fd;
-                printf("UART restarted successfully\n");
+                int new_fd = serial_restart(uart_fd, port, B115200);
+                if (new_fd < 0)
+                {
+                    printf("Failed to restart UART. Error code: %d\n", new_fd);
+                    uart_fd = -1;
+                }
+                else
+                {
+                    uart_fd = new_fd;
+                    printf("UART restarted successfully\n");
+                }
             }
             break;
-        case 5:
+
+        case 6:
             // exit
             close(uart_fd);
             printf("Exiting...\n");
