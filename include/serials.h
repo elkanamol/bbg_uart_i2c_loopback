@@ -36,7 +36,7 @@ ssize_t serial_read(int fd, uint8_t *data, uint16_t length);
  * @param length Number of bytes to write
  * @return ssize_t number of writen bytes on success, negative -1 error code on failure
  */
-ssize_t serial_write(int fd, uint8_t *data, uint16_t length);
+int serial_write(int fd, uint8_t *data, uint16_t length);
 
 /**
  * @brief Send a packet with CRC checksum over the serial port

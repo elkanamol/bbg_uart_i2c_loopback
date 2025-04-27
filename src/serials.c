@@ -38,26 +38,54 @@ ssize_t serial_read(int fd, uint8_t *data, uint16_t length)
     return retval;
 }
 
-ssize_t serial_write(int fd, uint8_t *data, uint16_t length)
+int serial_write(int fd, uint8_t *data, uint16_t length)
 {
     if (length > MAX_UART_BUFFER_SIZE || length == 0)
     {
         return -1;
     }
 
-    ssize_t retval = write(fd, data, length);
-    return retval;
+    ssize_t bytes_sent = write(fd, data, length);
+    if (bytes_sent < 0)
+    {
+        perror("Error writing to UART");
+    }
+    else if (bytes_sent < length)
+    {
+        printf("Warning: Only sent %zd of %zu bytes\n", bytes_sent, strlen(data));
+    }
+    else
+    {
+        printf("Data sent [%zd] bytes\n", bytes_sent);
+    }
+    return 0;
 }
 
 ssize_t serial_send_packet_crc(int fd, uint8_t *data, uint16_t length)
 {
+    if (length > MAX_UART_BUFFER_SIZE || length == 0)
+    {
+        return -1;
+    }
     uint8_t data_with_crc[MAX_UART_BUFFER_SIZE] = {0};
     uint16_t crc = crc16(data, length);
     printf("CRC: %x\n", crc);
     crc16_update_buffer(crc, data_with_crc, length);
-    ssize_t retval = serial_write(fd, data_with_crc, length + 2);
+    ssize_t bytes_sent = serial_write(fd, data_with_crc, length + 2);
+    if (bytes_sent < 0)
+    {
+        perror("Error writing to UART");
+    }
+    else if (bytes_sent < length)
+    {
+        printf("Warning: Only sent %zd of %zu bytes\n", bytes_sent, strlen(data));
+    }
+    else
+    {
+        printf("Data sent [%zd] bytes\n", bytes_sent);
+    }
     printf("Data with CRC: %s\n", data_with_crc);
-    return retval;
+    return bytes_sent;
 }
 
 
